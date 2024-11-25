@@ -2,6 +2,7 @@ package it.unibo.oop.lab.lambda;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,8 +62,8 @@ public final class LambdaUtilities {
         /*
          * Suggestion: consider Optional.filter
          */
-        final List<Optional<T>> newList = new ArrayList<Optional<T>>();
-        list.forEach(t -> { newList.add(Optional.of(t).filter(pre)); });
+        final List<Optional<T>> newList = new ArrayList<>();
+        list.forEach(t -> newList.add(Optional.of(t).filter(pre)));
         return newList;
     }
 
@@ -82,11 +83,11 @@ public final class LambdaUtilities {
         /*
          * Suggestion: consider Map.merge
          */
-        Map<R, Set<T>> m = new HashMap<>();
+        final Map<R, Set<T>> m = new HashMap<>();
         list.forEach(elem -> {
-            m.merge(op.apply(elem), Set.of(elem), (X, Y) -> {
-                X.addAll(Y);
-                return X;
+            m.merge(op.apply(elem), new HashSet<>(Set.of(elem)), (a, b) -> {
+                a.addAll(b);
+                return a;
             });
         });
         return m;
@@ -110,8 +111,8 @@ public final class LambdaUtilities {
          *
          * Keep in mind that a map can be iterated through its forEach method
          */
-        Map<K, V> newMap = new HashMap<>();
-        map.forEach((X,Y) -> newMap.put(X, Y.orElse(def.get())));
+        final Map<K, V> newMap = new HashMap<>();
+        map.forEach((a, b) -> newMap.put(a, b.orElse(def.get())));
         return newMap;
     }
 
@@ -121,7 +122,7 @@ public final class LambdaUtilities {
      */
     @SuppressWarnings("PMD.SystemPrintln")
     public static void main(final String[] args) {
-        final List<Integer> li = IntStream.range(1, 8).mapToObj(i -> Integer.valueOf(i)).collect(Collectors.toList());
+        final List<Integer> li = IntStream.range(1, 8).mapToObj(Integer::valueOf).collect(Collectors.toList());
         System.out.println(dup(li, x -> x + 100));
         /*
          * [1, 101, 2, 102, 3, 103, 4, 104, 5, 105, 6, 106, 7, 107]
