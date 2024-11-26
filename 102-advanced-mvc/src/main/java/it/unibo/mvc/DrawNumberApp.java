@@ -1,9 +1,7 @@
 package it.unibo.mvc;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
@@ -14,11 +12,8 @@ import java.util.StringTokenizer;
 public final class DrawNumberApp implements DrawNumberViewObserver {
     private static final int MIN = 0;
     private static final int MAX = 100;
-    private static final int ATTEMPTS = 10;
-    private static final String SEP = File.separator;
-    private static final String FILE_PATH = ".." + SEP + ".." + SEP + ".." + SEP + ".." 
-        + SEP + "resources"+ SEP +"config.yml";
-
+    private static final int ATTEMPTS = 5;
+    private static final String FILE_NAME = "config.yml";
     private final DrawNumber model;
     private final List<DrawNumberView> views;
     DrawNumberViewImpl view = new DrawNumberViewImpl();
@@ -28,6 +23,10 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
      *            the views to attach
      */
     public DrawNumberApp(final DrawNumberView... views) {
+        int min = MIN;
+        int max = MAX;
+        int attempts = ATTEMPTS;
+
         /*
          * Side-effect proof
          */
@@ -37,32 +36,37 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
             view.start();
         }
 
-        try (
-            final InputStream file = new FileInputStream(new File(FILE_PATH));
-            final InputStreamReader inputSR = new InputStreamReader(file);
-        ) {
+        try (InputStreamReader inputSR= new InputStreamReader(ClassLoader.getSystemResourceAsStream(FILE_NAME))) {
             int c;
-            String text = null;
-            while ((c = inputSR.read()) != -1) {
-                text = text + c;
-            }
-
-            StringTokenizer st = new StringTokenizer(text);
             int i = 0;
-            while (st.hasMoreTokens()) {
-                switch (i) {
-                    case 1: int min = Integer.parseInt(st.nextToken());
-                    case 3: int max = Integer.parseInt(st.nextToken());
-                    case 5: int attempts = Integer.parseInt(st.nextToken());
-                    default: st.nextToken(); 
-                }
+            final StringBuilder sb = new StringBuilder();
+            
+            while ((c = inputSR.read()) != -1) {//NOPMD best way to read char by char 
+                sb.append((char) c);
             }
-        } catch (Exception e) {
+            
+            final StringTokenizer st = new StringTokenizer(sb.toString());
+            while (st.hasMoreTokens()) { 
+                switch (i) { 
+                    case 1: 
+                        min = Integer.parseInt(st.nextToken());
+                        break;
+                    case 3: 
+                        max = Integer.parseInt(st.nextToken());
+                        break;
+                    case 5:
+                        attempts = Integer.parseInt(st.nextToken()); 
+                        break;
+                    default: 
+                        st.nextToken(); 
+                }
+                i++;
+            }
+        } catch (IOException e) {
             view.displayError(e.getMessage());
         }
-
         //set of the configuration
-        this.model = new DrawNumberImpl(MIN, MAX, ATTEMPTS);
+        this.model = new DrawNumberImpl(min, max, attempts);
     }
 
     @Override

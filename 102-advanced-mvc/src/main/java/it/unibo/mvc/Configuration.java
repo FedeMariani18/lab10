@@ -1,15 +1,12 @@
 package it.unibo.mvc;
 
-import java.io.*;
-import java.util.StringTokenizer;
-
 /**
  * Encapsulates the concept of configuration.
  */
 public final class Configuration {
-    private int max; 
-    private int min;
-    private int attempts;
+    private final int max; 
+    private final int min;
+    private final int attempts;
 
     private Configuration(final int max, final int min, final int attempts) {
         this.max = max;
@@ -67,11 +64,10 @@ public final class Configuration {
         private static final int MIN = 0;
         private static final int MAX = 100;
         private static final int ATTEMPTS = 1;
-        
         private int min = MIN;
         private int max = MAX;
         private int attempts = ATTEMPTS;
-        private boolean consumed = false;
+        private boolean consumed;
 
         /**
          * @param min the minimum value
